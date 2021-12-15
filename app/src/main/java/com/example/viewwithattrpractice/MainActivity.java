@@ -38,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRecycler = findViewById(R.id.pavilion_area);
+        mRecycler.setHasFixedSize(true);
+        mRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+
         //建立Request，設置動物園館資料連線
         Request request = new Request.Builder()
                 .url("https://data.taipei/api/v1/dataset/5a0e5fbb-72f8-41c6-908e-2fb25eff9b8a?scope=resourceAquire")
@@ -62,13 +67,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         parseJSON(result);
-                      mRecycler = findViewById(R.id.pavilion_area);
-                      mRecycler.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-                      mRecycler.addItemDecoration(new DividerItemDecoration(MainActivity.this,DividerItemDecoration.VERTICAL));
-                      mPavilionAreaAdapter = new PavilionAreaAdapter(MainActivity.this,mPavilionAreas);
-                      mRecycler.setAdapter(mPavilionAreaAdapter);
-
-
                     }
                 });
             }
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void parseJSON(String json) {
-
+        mPavilionAreas = new ArrayList<>();
         try {
             JSONObject jObject = new JSONObject(json);
             JSONArray jsonArray = jObject.getJSONObject("result").getJSONArray("results");
@@ -97,13 +95,14 @@ public class MainActivity extends AppCompatActivity {
                 String E_Memo = jsonObject.getString("E_Memo");
                 String id = jsonObject.getString("_id");
                 String E_URL = jsonObject.getString("E_URL");
-                mPavilionAreas = new ArrayList<>();
-                mPavilionAreas.add(new PavilionArea(E_Pic_URL,E_Geo,E_Info,E_no,E_Category,E_Name,E_Memo,id,E_URL));
 
+                mPavilionAreas.add(new PavilionArea(E_Pic_URL,E_Geo,E_Info,E_no,E_Category,E_Name,E_Memo,id,E_URL));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        mPavilionAreaAdapter = new PavilionAreaAdapter(MainActivity.this,mPavilionAreas);
+        mRecycler.setAdapter(mPavilionAreaAdapter);
     }
 
 
